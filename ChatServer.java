@@ -152,12 +152,12 @@ public class ChatServer implements Runnable{
                     if(user.inChatRoom())
                     {
                         sendRoomMessage(user, user.getChatRoom(), textInput, false);
+                        out.write(">> ");
+                        out.flush();
                     }
                     else
                     {
-                        out.write("Invalid command. Please join a room to chat.\n\r" );
-                        out.write(">>");
-                        out.flush();
+                        print("Invalid command. Please join a room to chat.\n\r", out);
                     }
                 }
             }
@@ -202,9 +202,9 @@ public class ChatServer implements Runnable{
             if(!roomUser.equals(user))
             {
                 if(isStatusMsg)
-                    roomUser.getThread().addMessage("<< " + msg);
+                    roomUser.getThread().addMessage(msg);
                 else
-                    roomUser.getThread().addMessage("<< " + user.getName() + ": " + msg);
+                    roomUser.getThread().addMessage(user.getName() + ": " + msg);
             }
         }
     }
@@ -231,9 +231,9 @@ public class ChatServer implements Runnable{
                             //join room
                             _user.setChatRoom(room);
                             room.addUser(_user);
-                            sendRoomMessage(_user, room, "** " + _user.getName() + " has joined the room.\n\r", true);
-                            print("You have been added to the room: " + roomName +"\n\r", out);
-                            print("Current users: \n\r", out);
+                            sendRoomMessage(_user, room, "** " + _user.getName() + " has joined the room.", true);
+                            out.write("You have been added to the room: " + roomName +"\n\r");
+                            out.write("Current users: \n\r");
                             
                             //Print all users currently in the room
                             ArrayList<ChatUser> roomUsers = room.getUsers();
@@ -361,7 +361,7 @@ public class ChatServer implements Runnable{
         try
         {
             out.write(msg);
-            out.write(" >>");
+            out.write(">> ");
             out.flush();
         }
         catch( IOException e )
