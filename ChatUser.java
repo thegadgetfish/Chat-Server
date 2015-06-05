@@ -12,22 +12,33 @@ import java.net.Socket;
  * @author Khuu
  */
 public class ChatUser {
-    private final int _num;
+    private int _num;
     private String _userName = "";
+    private ChatRoom _currRoom;
+    private ChatServer _thread;
     
-    public ChatUser(int num)
+    public ChatUser(int num, ChatServer thread)
     {
         _num = num;
         _userName = "";
+        _currRoom = null;
+        _thread = thread;
     }
     
-    public ChatUser(int num, String userName)
+    public Boolean inChatRoom()
     {
-        _num = num;
-        _userName = userName;
+        if(_currRoom != null)
+            return true;
+        else
+            return false;
     }
+    public void setChatRoom(ChatRoom room) { _currRoom = room; }
+    public ChatRoom getChatRoom() { return _currRoom;}
+    
+    public ChatServer getThread() { return _thread;}
     
     public void setName(String name) { _userName = name;}
     public String getName() { return _userName; }
+    
     public int getNum() { return _num; }
 }
