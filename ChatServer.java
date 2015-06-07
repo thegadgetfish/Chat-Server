@@ -6,9 +6,12 @@
 package chatserver;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -366,9 +369,17 @@ public class ChatServer implements Runnable{
     
     public static void serverLog(String text)
     {
-        System.out.println( text );
-    }
-    
+        System.out.print(text + "\r\n");
+
+        try(PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter("log.txt", true)))) 
+        {
+             out.println(text);
+        }
+        catch( IOException e )
+        {
+            System.out.println(" Error: " + e.toString() );
+        }
+}
     //Print user messages
     public void print(String msg, OutputStreamWriter out)
     {
