@@ -139,7 +139,7 @@ public class ChatServer implements Runnable{
             {
                 String textInput = in.readLine();
              
-                serverLog( user.getName()+ ": " + textInput );
+                //serverLog( user.getName()+ ": " + textInput );
                 if ( textInput.equals( "/quit" ) )
                 {
                     System.out.println( user.getName()+ " closed connection." );
@@ -218,6 +218,7 @@ public class ChatServer implements Runnable{
         }
     }
    
+    //If the input starts with '/', go through this list of checks
     public void checkCommand(String textInput, OutputStreamWriter out)
     {
         try
