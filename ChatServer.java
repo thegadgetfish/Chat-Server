@@ -12,7 +12,10 @@ import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Scanner;
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.TimeZone;
+
 
 
 /**
@@ -114,7 +117,6 @@ public class ChatServer implements Runnable{
                 serverLog("Close connection for user " + _num);
                 _socket.close();
             }
-        
         }
         catch ( IOException e )
         {
@@ -152,8 +154,6 @@ public class ChatServer implements Runnable{
                     if(user.inChatRoom())
                     {
                         sendRoomMessage(user, user.getChatRoom(), textInput, false);
-                        out.write(">> ");
-                        out.flush();
                     }
                     else
                     {
@@ -199,28 +199,40 @@ public class ChatServer implements Runnable{
         for(ChatUser roomUser:roomUsers)
         {
             //Send this message to everyone but yourself
-            if(!roomUser.equals(user))
-            {
+            //if(!roomUser.equals(user))
+            //{
                 if(isStatusMsg)
                     roomUser.getThread().addMessage(msg);
                 else
-                    roomUser.getThread().addMessage(user.getName() + ": " + msg);
-            }
+                {
+                    DateFormat format = DateFormat.getTimeInstance(DateFormat.SHORT);
+                    format.setTimeZone(TimeZone.getTimeZone("PST"));
+                    Date today = new Date();
+                    roomUser.getThread().addMessage("[" + format.format(today) + "] "
+                            + user.getName() + ": " + msg);
+                }
+            //}
         }
     }
-    
+   
     public void checkCommand(String textInput, OutputStreamWriter out)
     {
         try
         {
             //Check room joining first because room name is inputted by the user
-            serverLog("substring: " + textInput.substring(1,5));
+            //serverLog("substring: " + textInput.substring(1,5));
             String cmd = textInput.substring(1,5);
             if(cmd.matches("join"))
             {
                 serverLog("textinput is: " + textInput);
-                if(textInput.substring(6) != null)
+                if(textInput.length() > 5 && textInput.substring(6) != null)
                 {
+                    //Make sure they're not already in a room
+                    if(_user.inChatRoom())
+                    {
+                        print("Please leave this room first.\n\r", out);
+                        return;
+                    }
                     String roomName = textInput.substring(6);
                     serverLog("Room " + roomName + " created.");
                     //See if room already exists
@@ -278,8 +290,9 @@ public class ChatServer implements Runnable{
                         ArrayList<ChatUser> _roomUsers = currRoom.getUsers();
                         for (ChatUser user:_roomUsers)
                         {
-                            print(user.getName() + "\n\r", out);
+                            out.write("** " + user.getName() + "\n\r");
                         }
+                        print("End of list.\n\r", out);
                     }
                     else
                     {
@@ -295,9 +308,10 @@ public class ChatServer implements Runnable{
                     }
                     else
                     {
+                        out.write("** Name  |  (Users) **\n\r");
                         for(ChatRoom room : _chatRooms)
                         {
-                            out.write("** " + room.getName() + " (" + room.getNumUsers() + ") \n\r");
+                            out.write("** " + room.getName() + "  |  (" + room.getNumUsers() + ") \n\r");
                         }
                         print("End of list.\n\r", out);
                     }
